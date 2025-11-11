@@ -86,7 +86,7 @@ Below are the comparison results of the three models — **ResNet50 (CNN)**, **S
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/Melanoma_Detection.git
+git clone https://github.com/02priyeshraj/Melanoma_Detection_System.git
 cd Melanoma_Detection
 
 # Create virtual environment
@@ -102,7 +102,7 @@ streamlit run app.py
 
 ---
 
-## 🖼Results Overview
+## Results Overview
 
 Below are the key visuals of the **Melanoma Detection System**, including the web interface, prediction output, and Grad-CAM visualization.
 
