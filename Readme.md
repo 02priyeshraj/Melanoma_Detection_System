@@ -102,7 +102,7 @@ streamlit run app.py
 
 ---
 
-## 🖼Results Overview
+## Results Overview
 
 Below are the key visuals of the **Melanoma Detection System**, including the web interface, prediction output, and Grad-CAM visualization.
 
