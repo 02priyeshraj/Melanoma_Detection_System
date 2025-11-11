@@ -4,18 +4,32 @@ import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
 from pathlib import Path
+import gdown
+import os
 
 # -------------------------------
 # Config
 # -------------------------------
-MODEL_PATH = Path("model/resnet50_melanoma_best.pth")  # Relative path
+MODEL_PATH = Path("model/resnet50_melanoma_best.pth")
+DRIVE_URL = "https://drive.google.com/uc?id=1LbxdBGKK4B2gO-m_F8EsNmVvuiHSWqfM"  # <-- Converted to direct link
 IMG_SIZE = 224
+
+# -------------------------------
+# Ensure Model Exists
+# -------------------------------
+def download_model():
+    os.makedirs("model", exist_ok=True)
+    if not MODEL_PATH.exists():
+        with st.spinner("📦 Downloading model from Google Drive (first time only)..."):
+            gdown.download(DRIVE_URL, str(MODEL_PATH), quiet=False)
+        st.success("✅ Model downloaded successfully!")
 
 # -------------------------------
 # Model Definition
 # -------------------------------
 @st.cache_resource
 def load_model():
+    download_model()
     model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
     num_ftrs = model.fc.in_features
     model.fc = nn.Sequential(
@@ -60,9 +74,6 @@ def predict(model, image_tensor):
 # -------------------------------
 st.set_page_config(page_title="Melanoma Detection", page_icon="🩺", layout="centered")
 
-# -------------------------------
-# Custom Styling
-# -------------------------------
 st.markdown("""
     <style>
     .stApp {
@@ -89,8 +100,6 @@ st.markdown("""
         font-size: 0.9rem;
         margin-top: 2rem;
     }
-
-    /* Make Browse files button black with white text */
     [data-testid="stFileUploader"] section div div button {
         background-color: #000000 !important;
         color: #ffffff !important;
@@ -99,16 +108,13 @@ st.markdown("""
         font-weight: 500 !important;
         transition: all 0.2s ease;
     }
-
     [data-testid="stFileUploader"] section div div button:hover {
-        background-color: #1f2937 !important;  /* dark gray hover */
+        background-color: #1f2937 !important;
         border-color: #000000 !important;
         color: #ffffff !important;
     }
     </style>
 """, unsafe_allow_html=True)
-
-
 
 # -------------------------------
 # Header
@@ -120,7 +126,6 @@ st.markdown("<p class='subtitle'>Upload a dermoscopic image to predict if it’s
 # Upload Section
 # -------------------------------
 uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
-
 
 # -------------------------------
 # Inference
@@ -136,7 +141,6 @@ if uploaded_file is not None:
             label, prob = predict(model, image_tensor)
 
             st.subheader("🔍 Prediction Result:")
-
             if label == 1:
                 st.markdown("### 🩸 **Melanoma Detected**")
                 st.write(f"**Confidence:** {prob * 100:.2f}%")
@@ -145,8 +149,6 @@ if uploaded_file is not None:
                 st.markdown("### 🌿 **Benign (No Melanoma)**")
                 st.write(f"**Confidence:** {(1 - prob) * 100:.2f}%")
                 st.progress(float(1 - prob))
-
-            st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("Please upload an image to start the analysis.")
 
@@ -155,7 +157,7 @@ else:
 # -------------------------------
 st.markdown("""
 <div class='footer'>
-    Made with using <b>Streamlit</b> and <b>PyTorch</b><br>
-    <span style='font-size:0.8rem;'>AI-based skin lesion classifier for educational use</span>
+    Made with <b>Streamlit</b> + <b>PyTorch</b><br>
+    <span style='font-size:0.8rem;'>AI-based skin lesion classifier (for educational use)</span>
 </div>
 """, unsafe_allow_html=True)
